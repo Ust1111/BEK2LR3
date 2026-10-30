@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+option csharp_namespace = "ArticulationAPI.TranscriptionService.Grpc";
+
+package transcription;
+
+service TranscriptionGrpc {
+  rpc Transcribe (TranscribeRequest) returns (TranscribeReply);
+  rpc GetSupportedLanguages (GetSupportedLanguagesRequest) returns (GetSupportedLanguagesReply);
+  rpc PracticeSession (stream PracticeMessage) returns (stream PracticeEvent);
+}
+
+message TranscribeRequest {
+  string text = 1;
+  string language = 2;
+}
+
+message PhonemeMessage {
+  string symbol = 1;
+  string ipa = 2;
+  int32 position = 3;
+  float stress = 4;
+}
+
+message TranscribeReply {
+  string original_text = 1;
+  string language = 2;
+  repeated PhonemeMessage phonemes = 3;
+}
+
+message GetSupportedLanguagesRequest {}
+
+message GetSupportedLanguagesReply {
+  repeated string languages = 1;
+}
+
+message PracticeMessage {
+  string session_id = 1;
+  string created_at = 2;
+  string text = 3;
+  string language = 4;
+}
+
+enum PracticeEventType {
+  PHONEMES = 0;
+  STATE = 1;
+  ERROR = 2;
+}
+
+message PracticeEvent {
+  PracticeEventType type = 1;
+  string created_at = 2;
+  string original_text = 3;
+  string language = 4;
+  repeated PhonemeMessage phonemes = 5;
+  int32 words_practiced = 6;
+  string error_message = 7;
+}
